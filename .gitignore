@@ -5,3 +5,9 @@
 !source/matlab
 !source/matlab/*.m
 !source/matlab/Test_Imag.bmp
+
+!source/verilog
+!source/verilog/*.v
+
+!source/testbench
+!source/testbench/*.v
