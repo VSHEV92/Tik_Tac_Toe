@@ -26,7 +26,15 @@ initial reset = #100 0;
 // формирование сигнала управления
 initial begin
 	for(idx=0; idx<9; idx=idx+1)
-		ctrl_array[idx*4+:4] <= 0;
+		ctrl_array[idx*4+:4] <= 0;	
+	# 1000000;		
+	
+	for(idx=0; idx<8; idx=idx+1) begin
+		ctrl_array[idx*4+:4] <= idx+1;
+		# 17000000;
+	end
+
+	ctrl_array[8*4+:4] <= 1;	
 end
 
 // тестируемый модуль
@@ -57,7 +65,7 @@ always @(posedge clk)
 
 // заверщение моделирования
 initial begin
-	# 100000000; // сто милисекунд
+	# 300000000; // сто милисекунд
 	$fclose(f_pixel); 
 	$fclose(f_hsync); 
 	$fclose(f_vsync);

@@ -7,16 +7,6 @@ pixel_file_name = 'Pixels.txt';
 hsync_file_name = 'Hsync.txt';
 vsync_file_name = 'Vsync.txt';
 
-% параметры кадра
-% H_ACTIVE = 4*3;
-% H_FRONT = 1;
-% H_SYNC = 2;
-% H_BACK = 1;
-% V_ACTIVE = 5*3;
-% V_FRONT = 1;
-% V_SYNC = 3;
-% V_BACK = 2;
-
 H_ACTIVE = 800;
 H_FRONT = 40;
 H_SYNC = 128;

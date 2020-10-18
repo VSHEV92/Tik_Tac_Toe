@@ -20,25 +20,10 @@ parameter V_FRONT = 1;
 parameter V_SYNC = 4;
 parameter V_BACK = 23;
 
-parameter PICT_WIDTH = 295;
-parameter PICT_WIDTH_BLACK = 55;
-parameter PICT_HIGHT = 220;
+parameter PICT_WIDTH = 280;
+parameter PICT_WIDTH_BLACK = 40;
+parameter PICT_HIGHT = 215;
 parameter PICT_HIGHT_BLACK = 45;
-
-//parameter H_ACTIVE = 4*3;
-//parameter H_FRONT = 1;
-//parameter H_SYNC = 2;
-//parameter H_BACK = 1;
-//
-//parameter V_ACTIVE = 5*3;
-//parameter V_FRONT = 1;
-//parameter V_SYNC = 3;
-//parameter V_BACK = 2;
-
-//parameter PICT_WIDTH = 2;
-//parameter PICT_WIDTH_BLACK = 1;
-//parameter PICT_HIGHT = 5;
-//parameter PICT_HIGHT_BLACK = 2;
 
 integer idx;
 reg [12:0] V_Counter;
