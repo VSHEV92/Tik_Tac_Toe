@@ -10,34 +10,39 @@ module VGA_Controller(
 	output reg VSYNC
 );
 
-//parameter H_ACTIVE = 800;
-//parameter H_FRONT = 40;
-//parameter H_SYNC = 128;
-//parameter H_BACK = 88;
-//
-//parameter V_ACTIVE = 600;
-//parameter V_FRONT = 1;
-//parameter V_SYNC = 4;
-//parameter V_BACK = 23;
+parameter H_ACTIVE = 800;
+parameter H_FRONT = 40;
+parameter H_SYNC = 128;
+parameter H_BACK = 88;
 
-parameter H_ACTIVE = 4*3;
-parameter H_FRONT = 1;
-parameter H_SYNC = 2;
-parameter H_BACK = 1;
-
-parameter V_ACTIVE = 5*3;
+parameter V_ACTIVE = 600;
 parameter V_FRONT = 1;
-parameter V_SYNC = 3;
-parameter V_BACK = 2;
+parameter V_SYNC = 4;
+parameter V_BACK = 23;
 
-parameter PICT_WIDTH = 4;
-parameter PICT_WIDTH_BLACK = 1;
-parameter PICT_HIGHT = 5;
-parameter PICT_HIGHT_BLACK = 2;
+parameter PICT_WIDTH = 295;
+parameter PICT_WIDTH_BLACK = 55;
+parameter PICT_HIGHT = 220;
+parameter PICT_HIGHT_BLACK = 45;
+
+//parameter H_ACTIVE = 4*3;
+//parameter H_FRONT = 1;
+//parameter H_SYNC = 2;
+//parameter H_BACK = 1;
+//
+//parameter V_ACTIVE = 5*3;
+//parameter V_FRONT = 1;
+//parameter V_SYNC = 3;
+//parameter V_BACK = 2;
+
+//parameter PICT_WIDTH = 2;
+//parameter PICT_WIDTH_BLACK = 1;
+//parameter PICT_HIGHT = 5;
+//parameter PICT_HIGHT_BLACK = 2;
 
 integer idx;
-reg [9:0] V_Counter;
-reg [9:0] H_Counter;
+reg [12:0] V_Counter;
+reg [12:0] H_Counter;
 reg [3:0] ctrl_array[8:0];
 reg [3:0] ctrl_vector;
 
@@ -48,7 +53,17 @@ reg [15:0] MEM_ADDR;
 reg [2:0] pixel_valid_reg;
 
 wire cross_mem_val;
-wire zero_mem_val;
+wire cross_circle_mem_val;
+wire cross_cross_mem_val;
+
+wire circle_mem_val;
+wire circle_circle_mem_val;
+wire circle_cross_mem_val;
+
+wire empty_mem_val;
+wire empty_circle_mem_val;
+wire empty_cross_mem_val;
+
 
 reg Vsync_delay;
 
@@ -134,7 +149,15 @@ end
 // выбор памяти и выдача пикселя на выход
 always @(posedge CLK) begin
 	case(ctrl_vector)
-		0:        PIXEL_VALUE <= cross_mem_val;
+		0:        PIXEL_VALUE <= empty_mem_val;
+		1:        PIXEL_VALUE <= empty_cross_mem_val;
+		2:        PIXEL_VALUE <= empty_circle_mem_val;
+		3:        PIXEL_VALUE <= cross_mem_val;
+		4:        PIXEL_VALUE <= cross_cross_mem_val;
+		5:        PIXEL_VALUE <= cross_circle_mem_val;
+		6:        PIXEL_VALUE <= circle_mem_val;
+		7:        PIXEL_VALUE <= circle_cross_mem_val;
+		8:        PIXEL_VALUE <= circle_circle_mem_val;
 		default:  PIXEL_VALUE <= 0;
 	endcase
 end
@@ -158,8 +181,44 @@ end
 // блоки памяти с изображениями
 test_mem 
 #(
-	.DEPTH(20),
-	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Test_Imag.txt")
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Circle.txt")
+)
+circle_mem
+(
+	.CLK(CLK),
+	.ADDR(MEM_ADDR),
+	.Q(circle_mem_val)
+);	
+
+test_mem 
+#(
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Circle_Circle.txt")
+)
+circle_circle_mem
+(
+	.CLK(CLK),
+	.ADDR(MEM_ADDR),
+	.Q(circle_circle_mem_val)
+);	
+
+test_mem 
+#(
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Circle_Cross.txt")
+)
+circle_cross_mem
+(
+	.CLK(CLK),
+	.ADDR(MEM_ADDR),
+	.Q(circle_cross_mem_val)
+);
+
+test_mem 
+#(
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Cross.txt")
 )
 cross_mem
 (
@@ -168,4 +227,63 @@ cross_mem
 	.Q(cross_mem_val)
 );	
 
+test_mem 
+#(
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Cross_Cross.txt")
+)
+cross_cross_mem
+(
+	.CLK(CLK),
+	.ADDR(MEM_ADDR),
+	.Q(cross_cross_mem_val)
+);	
+
+test_mem 
+#(
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Cross_Circle.txt")
+)
+cross_circle_mem
+(
+	.CLK(CLK),
+	.ADDR(MEM_ADDR),
+	.Q(cross_circle_mem_val)
+);	
+
+test_mem 
+#(
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Empty.txt")
+)
+empty_mem
+(
+	.CLK(CLK),
+	.ADDR(MEM_ADDR),
+	.Q(empty_mem_val)
+);	
+
+test_mem 
+#(
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Empty_Circle.txt")
+)
+empty_circle_mem
+(
+	.CLK(CLK),
+	.ADDR(MEM_ADDR),
+	.Q(empty_circle_mem_val)
+);	
+
+test_mem 
+#(
+	.DEPTH(64900),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Empty_Cross.txt")
+)
+empty_cross_mem
+(
+	.CLK(CLK),
+	.ADDR(MEM_ADDR),
+	.Q(empty_cross_mem_val)
+);		
 endmodule

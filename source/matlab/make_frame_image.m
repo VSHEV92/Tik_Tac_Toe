@@ -8,14 +8,24 @@ hsync_file_name = 'Hsync.txt';
 vsync_file_name = 'Vsync.txt';
 
 % параметры кадра
-H_ACTIVE = 4*3;
-H_FRONT = 1;
-H_SYNC = 2;
-H_BACK = 1;
-V_ACTIVE = 5*3;
+% H_ACTIVE = 4*3;
+% H_FRONT = 1;
+% H_SYNC = 2;
+% H_BACK = 1;
+% V_ACTIVE = 5*3;
+% V_FRONT = 1;
+% V_SYNC = 3;
+% V_BACK = 2;
+
+H_ACTIVE = 800;
+H_FRONT = 40;
+H_SYNC = 128;
+H_BACK = 88;
+
+V_ACTIVE = 600;
 V_FRONT = 1;
-V_SYNC = 3;
-V_BACK = 2;
+V_SYNC = 4;
+V_BACK = 23;
 
 % размеры кадра
 H_Size = H_ACTIVE+H_FRONT+H_SYNC+H_BACK;

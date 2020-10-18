@@ -1,8 +1,8 @@
 clc
 clear
 
-bmp_file_name = 'Test_Imag.bmp';
-txt_file_name = 'Test_Imag.txt';
+bmp_file_name = 'Empty_Cross.bmp';
+txt_file_name = 'Empty_Cross.txt';
 
 % считываем файл и вычисляем его размер
 image = imread(bmp_file_name, 'bmp');

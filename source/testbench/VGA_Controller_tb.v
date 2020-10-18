@@ -2,7 +2,7 @@
 
 module VGA_Controller_tb();
 
-time clk_period = 10;
+time clk_period = 25;
 
 reg clk = 0;
 reg reset = 1;
@@ -21,7 +21,7 @@ integer f_pixel, f_hsync, f_vsync;
 always clk = #(clk_period/2) ~clk;
 
 // формирование сигнала сброса
-initial reset = #10 0; 
+initial reset = #100 0; 
 
 // формирование сигнала управления
 initial begin
@@ -57,7 +57,7 @@ always @(posedge clk)
 
 // заверщение моделирования
 initial begin
-	# 100000;
+	# 100000000; // сто милисекунд
 	$fclose(f_pixel); 
 	$fclose(f_hsync); 
 	$fclose(f_vsync);
