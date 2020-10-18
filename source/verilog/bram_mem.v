@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module test_mem
+module bram_mem
 #(
 	parameter DEPTH,
 	parameter FILE_NAME
@@ -11,7 +11,7 @@ module test_mem
 	output reg   Q
 );
 
-reg MEM_VALUE[65535:0];
+reg MEM_VALUE[DEPTH:0];
 integer idx, data_file;
 
 // считываем содержимое файла в память

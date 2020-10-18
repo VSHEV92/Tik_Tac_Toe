@@ -65,7 +65,7 @@ always @(posedge clk)
 
 // заверщение моделирования
 initial begin
-	# 300000000; // сто милисекунд
+	# 150000000; // сто милисекунд
 	$fclose(f_pixel); 
 	$fclose(f_hsync); 
 	$fclose(f_vsync);

@@ -25,6 +25,9 @@ parameter PICT_WIDTH_BLACK = 40;
 parameter PICT_HIGHT = 215;
 parameter PICT_HIGHT_BLACK = 45;
 
+parameter LITTLE_PICT_WIDTH = 56;
+parameter LITTLE_PICT_HIGHT = 43;
+
 integer idx;
 reg [12:0] V_Counter;
 reg [12:0] H_Counter;
@@ -35,20 +38,18 @@ reg [15:0] MEM_ADDR_H;
 reg [15:0] MEM_ADDR_V;
 reg [15:0] MEM_ADDR;
 
+reg [15:0] LITTLE_MEM_ADDR_H;
+reg [15:0] LITTLE_MEM_ADDR_V;
+reg [15:0] LITTLE_MEM_ADDR;
+
 reg [2:0] pixel_valid_reg;
 
 wire cross_mem_val;
-wire cross_circle_mem_val;
-wire cross_cross_mem_val;
-
 wire circle_mem_val;
-wire circle_circle_mem_val;
-wire circle_cross_mem_val;
-
 wire empty_mem_val;
-wire empty_circle_mem_val;
-wire empty_cross_mem_val;
 
+wire little_cross_mem_val;
+wire little_circle_mem_val;
 
 reg Vsync_delay;
 
@@ -85,11 +86,18 @@ always @(posedge CLK)
 		end
 	end
 
-// пересчет счетчиков координат в адрес для памяти
+// пересчет счетчиков координат в адрес для памяти больших картинок
 always @(*) begin
 	MEM_ADDR_V = V_Counter % PICT_HIGHT; 
 	MEM_ADDR_H = H_Counter % PICT_WIDTH;
 	MEM_ADDR = MEM_ADDR_V*PICT_WIDTH + MEM_ADDR_H;
+end
+
+// пересчет счетчиков координат в адрес для памяти маленьких картинок
+always @(*) begin
+	LITTLE_MEM_ADDR_V = V_Counter % LITTLE_PICT_HIGHT; 
+	LITTLE_MEM_ADDR_H = H_Counter % LITTLE_PICT_WIDTH;
+	LITTLE_MEM_ADDR = LITTLE_MEM_ADDR_V*LITTLE_PICT_WIDTH + LITTLE_MEM_ADDR_H;
 end
 
 // выбор вектора управления по счетчикам пикселей
@@ -135,14 +143,14 @@ end
 always @(posedge CLK) begin
 	case(ctrl_vector)
 		0:        PIXEL_VALUE <= empty_mem_val;
-		1:        PIXEL_VALUE <= empty_cross_mem_val;
-		2:        PIXEL_VALUE <= empty_circle_mem_val;
+		1:        PIXEL_VALUE <= empty_mem_val | little_cross_mem_val;
+		2:        PIXEL_VALUE <= empty_mem_val | little_circle_mem_val;
 		3:        PIXEL_VALUE <= cross_mem_val;
-		4:        PIXEL_VALUE <= cross_cross_mem_val;
-		5:        PIXEL_VALUE <= cross_circle_mem_val;
+		4:        PIXEL_VALUE <= cross_mem_val | little_cross_mem_val;
+		5:        PIXEL_VALUE <= cross_mem_val | little_circle_mem_val;
 		6:        PIXEL_VALUE <= circle_mem_val;
-		7:        PIXEL_VALUE <= circle_cross_mem_val;
-		8:        PIXEL_VALUE <= circle_circle_mem_val;
+		7:        PIXEL_VALUE <= circle_mem_val | little_cross_mem_val;
+		8:        PIXEL_VALUE <= circle_mem_val | little_circle_mem_val;
 		default:  PIXEL_VALUE <= 0;
 	endcase
 end
@@ -164,7 +172,7 @@ always @(posedge CLK) begin
 end	
 		
 // блоки памяти с изображениями
-test_mem 
+bram_mem 
 #(
 	.DEPTH(64900),
 	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Circle.txt")
@@ -176,31 +184,8 @@ circle_mem
 	.Q(circle_mem_val)
 );	
 
-test_mem 
-#(
-	.DEPTH(64900),
-	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Circle_Circle.txt")
-)
-circle_circle_mem
-(
-	.CLK(CLK),
-	.ADDR(MEM_ADDR),
-	.Q(circle_circle_mem_val)
-);	
 
-test_mem 
-#(
-	.DEPTH(64900),
-	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Circle_Cross.txt")
-)
-circle_cross_mem
-(
-	.CLK(CLK),
-	.ADDR(MEM_ADDR),
-	.Q(circle_cross_mem_val)
-);
-
-test_mem 
+bram_mem 
 #(
 	.DEPTH(64900),
 	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Cross.txt")
@@ -212,31 +197,8 @@ cross_mem
 	.Q(cross_mem_val)
 );	
 
-test_mem 
-#(
-	.DEPTH(64900),
-	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Cross_Cross.txt")
-)
-cross_cross_mem
-(
-	.CLK(CLK),
-	.ADDR(MEM_ADDR),
-	.Q(cross_cross_mem_val)
-);	
 
-test_mem 
-#(
-	.DEPTH(64900),
-	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Cross_Circle.txt")
-)
-cross_circle_mem
-(
-	.CLK(CLK),
-	.ADDR(MEM_ADDR),
-	.Q(cross_circle_mem_val)
-);	
-
-test_mem 
+bram_mem 
 #(
 	.DEPTH(64900),
 	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Empty.txt")
@@ -248,27 +210,29 @@ empty_mem
 	.Q(empty_mem_val)
 );	
 
-test_mem 
+bram_mem 
 #(
-	.DEPTH(64900),
-	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Empty_Circle.txt")
+	.DEPTH(2408),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Little_Circle.txt")
 )
-empty_circle_mem
+little_circle_mem
 (
 	.CLK(CLK),
-	.ADDR(MEM_ADDR),
-	.Q(empty_circle_mem_val)
+	.ADDR(LITTLE_MEM_ADDR),
+	.Q(little_circle_mem_val)
 );	
 
-test_mem 
+bram_mem 
 #(
-	.DEPTH(64900),
-	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Empty_Cross.txt")
+	.DEPTH(2408),
+	.FILE_NAME("D:/Tik_Tac_Toe/source/matlab/Little_Cross.txt")
 )
-empty_cross_mem
+little_cross_mem
 (
 	.CLK(CLK),
-	.ADDR(MEM_ADDR),
-	.Q(empty_cross_mem_val)
-);		
+	.ADDR(LITTLE_MEM_ADDR),
+	.Q(little_cross_mem_val)
+);	
+
+
 endmodule
