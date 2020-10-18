@@ -5,8 +5,9 @@ module VGA_Controller(
 	input  RESET,
 	input  [4*9-1:0] CONTROL_ARRAY,
 	output reg PIXEL_VALUE,
-	output HSYNC,
-	output VSYNC
+	output     PIXEL_VALID,
+	output reg HSYNC,
+	output reg VSYNC
 );
 
 //parameter H_ACTIVE = 800;
@@ -32,6 +33,7 @@ parameter V_BACK = 2;
 parameter PICT_WIDTH = 4;
 parameter PICT_WIDTH_BLACK = 1;
 parameter PICT_HIGHT = 5;
+parameter PICT_HIGHT_BLACK = 2;
 
 integer idx;
 reg [9:0] V_Counter;
@@ -43,9 +45,23 @@ reg [15:0] MEM_ADDR_H;
 reg [15:0] MEM_ADDR_V;
 reg [15:0] MEM_ADDR;
 
+reg [2:0] pixel_valid_reg;
+
 wire cross_mem_val;
 wire zero_mem_val;
 
+reg Vsync_delay;
+
+// формирование сигнала валидности данных
+always @(posedge CLK)
+	if(RESET)
+		pixel_valid_reg <= 1;
+	else
+		pixel_valid_reg[2:1] <= pixel_valid_reg[1:0];
+
+assign PIXEL_VALID = pixel_valid_reg[2]; 
+		
+	
 // защелкивание сигнала управления только в начале кадра
 always @(posedge CLK)
 	if (V_Counter == 0 && H_Counter == 0)
@@ -101,7 +117,7 @@ always @(posedge CLK) begin
 			ctrl_vector <= 4'hF;
 		
 	// третья строка квадратов
-	else
+	else if(V_Counter < 3*PICT_HIGHT-PICT_HIGHT_BLACK)
 		if(H_Counter < PICT_WIDTH)
 			ctrl_vector <= ctrl_array[6];
 		else if(H_Counter < 2*PICT_WIDTH)
@@ -109,7 +125,9 @@ always @(posedge CLK) begin
 		else if(H_Counter < 3*PICT_WIDTH-PICT_WIDTH_BLACK)
 			ctrl_vector <= ctrl_array[8];
 		else
-			ctrl_vector <= 4'hF;	
+			ctrl_vector <= 4'hF;
+	else
+		ctrl_vector <= 4'hF;	
 end
 
 
@@ -121,7 +139,22 @@ always @(posedge CLK) begin
 	endcase
 end
 
-	
+//	формироание сигнала строчной синхронизации
+always @(posedge CLK)
+	if (H_Counter > H_ACTIVE+H_FRONT && H_Counter<=H_ACTIVE+H_FRONT+H_SYNC)
+		HSYNC <= 0;
+	else	
+		HSYNC <= 1;
+
+//	формироание сигнала кадровой синхронизации
+always @(posedge CLK) begin
+	if (V_Counter > V_ACTIVE+V_FRONT-1 && V_Counter<=V_ACTIVE+V_FRONT+V_SYNC-1)
+		Vsync_delay <= 0;
+	else	
+		Vsync_delay <= 1;
+	VSYNC <= Vsync_delay;
+end	
+		
 // блоки памяти с изображениями
 test_mem 
 #(

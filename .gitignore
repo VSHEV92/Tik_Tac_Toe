@@ -4,7 +4,8 @@
 !source
 !source/matlab
 !source/matlab/*.m
-!source/matlab/Test_Imag.bmp
+!source/matlab/*.bmp
+!source/matlab/*.png
 
 !source/verilog
 !source/verilog/*.v
