@@ -12,3 +12,9 @@
 
 !source/testbench
 !source/testbench/*.v
+
+!source/IPS
+!source/IPS/PLL
+!source/IPS/PLL/*
+!source/IPS/ISSP
+!source/IPS/ISSP/*
