@@ -3,6 +3,10 @@
 module Tik_Tac_Toe(
 	input	 CLK,
 	input	 RESET_N,
+	inout  PS2_CLK,
+	inout  PS2_DATA,
+	output PS2_CLK_OUT,
+	output PS2_DATA_OUT,
 	output VGA_R,
 	output VGA_G,
 	output VGA_B,
@@ -33,22 +37,34 @@ end
 // ----------------------------------------------------------------------	
 //assign control_array = 36'h000000000; 
 
-VGAC_Test_Source u0 (
-	.source     (control_array),
-	.source_clk (clk_40MHz)
-);
+//VGAC_Test_Source u0 (
+//	.source     (control_array),
+//	.source_clk (clk_40MHz)
+//);
 // ----------------------------------------------------------------------	
 
 
 // контроллер управления монитором 	
-VGA_Controller VGA_Controller_Inst(
+//VGA_Controller VGA_Controller_Inst(
+//	.CLK(clk_40MHz),
+//	.RESET(reset),
+//	.CONTROL_ARRAY(control_array),
+//	.PIXEL_VALUE(pixel_value),
+//	.PIXEL_VALID(),
+//	.HSYNC(VGA_HSYNC),
+//	.VSYNC(VGA_VSYNC)
+//);
+
+// контроллер управления клавиатурой
+PS2_Controller PS2_Controller_Inst(
 	.CLK(clk_40MHz),
 	.RESET(reset),
-	.CONTROL_ARRAY(control_array),
-	.PIXEL_VALUE(pixel_value),
-	.PIXEL_VALID(),
-	.HSYNC(VGA_HSYNC),
-	.VSYNC(VGA_VSYNC)
+	.PS2_CLK(PS2_CLK),
+	.PS2_DATA(PS2_DATA),
+	.PS2_CLK_OUT(PS2_CLK_OUT),
+	.PS2_DATA_OUT(PS2_DATA_OUT),
+	.KEY_VALUE(),
+	.KEY_VALID()
 );
 
 assign VGA_R = pixel_value;

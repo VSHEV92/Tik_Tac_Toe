@@ -18,3 +18,5 @@
 !source/IPS/PLL/*
 !source/IPS/ISSP
 !source/IPS/ISSP/*
+!source/IPS/IO_BUF
+!source/IPS/IO_BUF/*
