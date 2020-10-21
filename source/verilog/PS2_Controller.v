@@ -5,10 +5,8 @@ module PS2_Controller(
 	input  RESET,
 	inout  PS2_CLK,
 	inout  PS2_DATA,
-	output PS2_CLK_OUT,
-	output PS2_DATA_OUT,
-	output KEY_VALUE,
-	output KEY_VALID
+	output reg [2:0] KEY_VALUE,
+	output reg       KEY_VALID
 );
 
 parameter PS2_DELAY_10000 = 10000000/25; // 10 мс при тактовой частоте 40 МГц 
@@ -17,9 +15,18 @@ parameter PS2_DELAY_500 = 500000/25; // 500мкс при тактовой час
 reg [32:0] delay_counter;
 reg [1:0] command_counter;
 
+reg [10:0] PS2_DATA_Shift_reg;
+reg [3:0]  PS2_DATA_Counter;
+integer i;
+
+reg [7:0] Scan_Value;
+reg       Scan_Valid;
+
 reg [3:0] parity_bits = 3'b000;
 
-//reg command_value[7:0][2:0] = {24'hF9, 8'h00, 8'hF0};      // команда выключения сигнала отжатия и повтора
+// F0 - переключить scan set
+// 03 - номер scan set
+// F9 - отключить break и repeat
 reg [23:0] command_value = 24'hF903F0;
 
 reg [2:0] state_flag;	// 000 - clk в z, data в z
@@ -40,9 +47,6 @@ reg [1:0] p2_data_reg;
 reg ps2_data_sync, ps2_clk_falling;
 
 reg com_transfer_done;
-
-assign PS2_CLK_OUT = ps2_clk_in;
-assign PS2_DATA_OUT = ps2_data_in;
 					
 // двунаправленные буферы для сигнала тактов и данных		
 IO_BUF_iobuf_bidir_30p IO_BUF_PS2_CLK
@@ -71,7 +75,8 @@ begin
 	ps2_data_sync <= p2_data_reg[1];
 end
 
-// автомат управления	
+// ------------------------------------------------------------------------
+// загрузка команда управления 
 always @(posedge CLK)
 begin
 	if(RESET) begin
@@ -176,5 +181,71 @@ begin
 end
 
 
+// ---------------------------------------------------------------------------
+// прием данных от клавиатуры
+
+// регистр сдвига и счетчик для защелкивания данных 
+always @(posedge CLK) 
+begin
+   Scan_Valid <= 0;
+   if (RESET) begin
+		PS2_DATA_Shift_reg <= 0;
+		PS2_DATA_Counter <= 0;
+	end
+	else if(ps2_clk_falling & com_transfer_done) begin
+		PS2_DATA_Shift_reg[10] <= ps2_data_sync;
+		
+		for(i=0; i<10; i= i+1)
+			PS2_DATA_Shift_reg[i] <= PS2_DATA_Shift_reg[i+1];
+		
+		PS2_DATA_Counter <= PS2_DATA_Counter + 1;
+		
+		if (PS2_DATA_Counter == 10) begin
+			PS2_DATA_Counter <= 0;
+			Scan_Value <= PS2_DATA_Shift_reg[9:2];
+			Scan_Valid <= 1;
+		end
+			
+	end
+end
+
+
+// кодирование перед выдачей данных
+always @(posedge CLK) 
+begin
+   KEY_VALID <= 0;
+	if (RESET) begin
+		KEY_VALUE <= 3'b000;
+		KEY_VALID <= 0;
+	end else	if(Scan_Valid) begin
+	   // меняем флаг нажатия, чтобы не защелкнуть данные при отпускании клавиши 
+		case (Scan_Value)
+			8'h61: begin  // стрелка влево
+				KEY_VALUE <= 3'b001;
+				KEY_VALID <= 1;
+			end
+			8'h63: begin  // стрелка вверх 
+				KEY_VALUE <= 3'b010;
+				KEY_VALID <= 1;
+			end
+			8'h6A: begin  // стрелка вправо
+				KEY_VALUE <= 3'b011;
+				KEY_VALID <= 1;  
+			end
+			8'h60: begin  // стрелка вниз
+				KEY_VALUE <= 3'b100;
+				KEY_VALID <= 1;
+			end
+			8'h29: begin  // пробел 
+				KEY_VALUE <= 3'b101;
+				KEY_VALID <= 1;
+			end
+			default: begin
+				KEY_VALUE <= 3'b000;
+				KEY_VALID <= 0;
+			end
+		endcase
+	end
+end
 
 endmodule

@@ -7,6 +7,12 @@
 !source/matlab/*.bmp
 !source/matlab/*.png
 
+!Tik_Tac_Toe
+!Tik_Tac_Toe/Tik_Tac_Toe.out.sdc
+!Tik_Tac_Toe/Tik_Tac_Toe.qpf
+!Tik_Tac_Toe/Tik_Tac_Toe.qsf
+!Tik_Tac_Toe/Tik_Tac_Toe.qws
+
 !source/verilog
 !source/verilog/*.v
 
@@ -16,7 +22,5 @@
 !source/IPS
 !source/IPS/PLL
 !source/IPS/PLL/*
-!source/IPS/ISSP
-!source/IPS/ISSP/*
 !source/IPS/IO_BUF
 !source/IPS/IO_BUF/*
