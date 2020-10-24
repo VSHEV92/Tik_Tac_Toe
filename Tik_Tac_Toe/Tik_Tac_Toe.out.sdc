@@ -20,7 +20,7 @@
 ## PROGRAM "Quartus Prime"
 ## VERSION "Version 19.1.0 Build 670 09/22/2019 SJ Standard Edition"
 
-## DATE    "Mon Oct 19 20:10:48 2020"
+## DATE    "Sat Oct 24 17:59:06 2020"
 
 ##
 ## DEVICE  "EP4CE6E22C8"
@@ -83,6 +83,8 @@ create_generated_clock -name {PLL_Inst|altpll_component|auto_generated|pll1|clk[
 # Set False Path
 #**************************************************************
 
+set_false_path -from [get_ports {PS2_CLK PS2_DATA RESET_N}] 
+set_false_path -to [get_ports {PS2_CLK PS2_DATA VGA_B VGA_G VGA_HSYNC VGA_R VGA_VSYNC}]
 
 
 #**************************************************************
